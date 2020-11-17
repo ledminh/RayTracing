@@ -26,8 +26,20 @@ ofColor Texture::getColor(float u, float v) {
 // Sphere
 //
 bool Sphere::intersect(const Ray &ray, glm::vec3 &point, glm::vec3 &normal) {
-	return (glm::intersectRaySphere(ray.p, ray.d, position, radius, point, normal));
+	bool result = glm::intersectRaySphere(ray.p, ray.d, position, radius, point, normal);
+
+	getNormal(normal);
+
+	return result;
 }
+
+void Sphere::getNormal(glm::vec3 &normal) {
+	if (haveBumpMap) {
+		bumpMap.getNormal(normal);
+	}
+}
+
+
 void Sphere::draw() {
 	if (isMouseSelected() || isKeyBoardSelected()) {
 		ofSetColor(ofColor::red);
@@ -44,21 +56,21 @@ void Sphere::move(glm::vec3 diff) {
 		position = position + diff;
 }
 
-ofColor Sphere::getDiffuseColor(glm::vec3 point) {
+ofColor Sphere::getDiffuseColor(const glm::vec3 &point) {
 	if (!haveTexture) return diffuseColor;
 
 	return getTextureColor(point);
 
 }
 
-ofColor Sphere::getSpecularColor(glm::vec3 point) {
+ofColor Sphere::getSpecularColor(const glm::vec3 &point) {
 	if (!haveTexture) return diffuseColor;
 
 	return getTextureColor(point);
 
 }
 
-ofColor Sphere::getTextureColor(glm::vec3 point) {
+ofColor Sphere::getTextureColor(const glm::vec3 &point) {
 	glm::vec3 d = glm::normalize(point - position),
 		dx = glm::vec3(d.x, 0, 0),
 		dy = glm::vec3(0, d.y, 0),
@@ -217,21 +229,21 @@ void Plane::draw() {
 	plane.drawWireframe();
 }
 
-ofColor Plane::getDiffuseColor(glm::vec3 point) {
+ofColor Plane::getDiffuseColor(const glm::vec3 &point) {
 	if (!haveTexture) return diffuseColor;
 
 	return getTextureColor(point);
 
 }
 
-ofColor Plane::getSpecularColor(glm::vec3 point) {
+ofColor Plane::getSpecularColor(const glm::vec3 &point) {
 	if (!haveTexture) return diffuseColor;
 
 	return getTextureColor(point);
 
 }
 
-ofColor Plane::getTextureColor(glm::vec3 point) {
+ofColor Plane::getTextureColor(const glm::vec3 &point) {
 	float u, v;
 
 	if (normal.x == 1) {

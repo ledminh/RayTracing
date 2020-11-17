@@ -3,6 +3,24 @@
 #include "Ray.h"
 
 
+//Class BumpMap
+//
+class BumpMap {
+public:
+	BumpMap() {}
+	BumpMap(ofImage i) { loadBumpMap(i); }
+
+	void loadBumpMap(ofImage i) { image = i; }
+
+	void getNormal(glm::vec3 &normal) {};
+
+private:
+	ofImage image;
+
+};
+
+//Class Texture
+//
 class Texture {
 public:
 	Texture() {}
@@ -35,6 +53,11 @@ public:
 		haveTexture = true;
 	}
 
+	virtual void setBumpMap(BumpMap bm) {
+		bumpMap = bm;
+		haveBumpMap = true;
+	}
+
 	void setMouseSelected(bool s) { bMouseSelected = s; }
 	bool isMouseSelected() { return bMouseSelected; }
 
@@ -48,12 +71,13 @@ public:
 	// any data common to all scene objects goes here
 	glm::vec3 position = glm::vec3(0, 0, 0);
 
-	virtual ofColor getDiffuseColor(glm::vec3 point) { return diffuseColor; }
-	virtual ofColor getSpecularColor(glm::vec3 point) { return specularColor; }
+	virtual ofColor getDiffuseColor(const glm::vec3 &point) { return diffuseColor; }
+	virtual ofColor getSpecularColor(const glm::vec3 &point) { return specularColor; }
 
 	virtual void setDiffuseColor(ofColor d) { diffuseColor = d; }
 	virtual void setSpecularColor(ofColor s) { specularColor = s; }
 
+	virtual void getNormal(glm::vec3 & normal) {}
 
 protected:
 	// material properties (we will ultimately replace this with a Material class - TBD)
@@ -61,8 +85,13 @@ protected:
 	ofColor diffuseColor = ofColor::grey;    // default colors - can be changed.
 	ofColor specularColor = ofColor::white;
 
-	bool haveTexture = false;
+	bool haveTexture = false,
+		 haveBumpMap = false;
+
+
 	Texture texture;
+	BumpMap bumpMap;
+
 	int tile = 1;
 
 	bool bMouseSelected = false,
@@ -81,13 +110,15 @@ public:
 
 	void move(glm::vec3 diff); 
 
-	ofColor getDiffuseColor(glm::vec3 point);
-	ofColor getSpecularColor(glm::vec3 point); 
+	ofColor getDiffuseColor(const glm::vec3 &point);
+	ofColor getSpecularColor(const glm::vec3 &point);
+
+	void getNormal(glm::vec3 & normal);
 
 	float radius = 1.0;
 
 private:
-	ofColor getTextureColor(glm::vec3 point); 
+	ofColor getTextureColor(const glm::vec3 &point); 
 };
 
 //  Mesh class (will complete later- this will be a refinement of Mesh from Project 1)
@@ -113,8 +144,8 @@ public:
 
 	void draw(); 
 
-	ofColor getDiffuseColor(glm::vec3 point); 
-	ofColor getSpecularColor(glm::vec3 point); 
+	ofColor getDiffuseColor(const glm::vec3 &point); 
+	ofColor getSpecularColor(const glm::vec3 &point); 
 
 	
 	glm::vec3 normal = glm::vec3(0, 1, 0);
@@ -126,5 +157,5 @@ public:
 	glm::vec3 origin;
 
 private:
-	ofColor getTextureColor(glm::vec3 point); 
+	ofColor getTextureColor(const glm::vec3 &point); 
 };
